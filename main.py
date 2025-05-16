@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QStackedWidg
 from placeholder_page import PlaceholderPage  # 可将原 PlaceholderPage 拆出
 from cube_page import CubePage  # ✅ 引入新的页面
 from draggable_page import DraggablePage  # ✅ 导入新页面
+from buzzer_page import BuzzerPage
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -22,6 +23,7 @@ class MainWindow(QMainWindow):
             "功能二",
             "cube",   # ✅ 新页面
             "drag",
+            "buzzer",
             "设置",
             "关于"
         ])
@@ -36,6 +38,7 @@ class MainWindow(QMainWindow):
             "功能二": PlaceholderPage("功能二"),
             "cube": CubePage(),
             "drag": DraggablePage(),
+            "buzzer": BuzzerPage(),
             "设置": PlaceholderPage("设置"),
             "关于": PlaceholderPage("关于")
         }
