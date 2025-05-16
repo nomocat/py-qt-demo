@@ -11,6 +11,7 @@ class CubeGLWidget(QGLWidget):
         self.last_pos = None
         self.x_rot = 0
         self.y_rot = 0
+        self.zoom = -6
 
     def initializeGL(self):
         glClearColor(0.1, 0.1, 0.1, 1.0)
@@ -27,6 +28,9 @@ class CubeGLWidget(QGLWidget):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
         glTranslatef(0, 0, -6)
+
+        # 视距根据缩放变化
+        glTranslatef(0, 0, self.zoom)
 
         # 根据拖拽更新旋转角度
         glRotatef(self.x_rot, 1, 0, 0)
@@ -79,6 +83,15 @@ class CubeGLWidget(QGLWidget):
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.last_pos = None
+    def wheelEvent(self, event):
+        # 滚轮滚动，delta为正向前（放大），负向后（缩小）
+        delta = event.angleDelta().y() / 120  # 一个滚动刻度为120
+        self.zoom += delta * 0.5  # 缩放速度
+
+        # 限制缩放范围，避免摄像机穿透立方体或过远
+        self.zoom = min(-2, max(-20, self.zoom))
+
+        self.update()
 
 class CubePage(QWidget):
     def __init__(self):
