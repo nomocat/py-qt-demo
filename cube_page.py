@@ -1,15 +1,16 @@
 # cube_page.py
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
-from PyQt5.QtGui import QSurfaceFormat
 from PyQt5.QtOpenGL import QGLWidget
 from OpenGL.GL import *
 from OpenGL.GLU import *
-import math
+from PyQt5.QtCore import Qt
 
 class CubeGLWidget(QGLWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.angle = 0
+        self.last_pos = None
+        self.x_rot = 0
+        self.y_rot = 0
 
     def initializeGL(self):
         glClearColor(0.1, 0.1, 0.1, 1.0)
@@ -26,11 +27,12 @@ class CubeGLWidget(QGLWidget):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
         glTranslatef(0, 0, -6)
-        glRotatef(self.angle, 1, 1, 0)
+
+        # 根据拖拽更新旋转角度
+        glRotatef(self.x_rot, 1, 0, 0)
+        glRotatef(self.y_rot, 0, 1, 0)
 
         self.draw_cube()
-        self.angle += 1
-        self.update()
 
     def draw_cube(self):
         vertices = [
@@ -56,6 +58,27 @@ class CubeGLWidget(QGLWidget):
                 glColor3f(0.8, 0.8, 1.0)
                 glVertex3fv(vertices[vertex])
         glEnd()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.last_pos = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.last_pos is not None:
+            dx = event.x() - self.last_pos.x()
+            dy = event.y() - self.last_pos.y()
+
+            self.x_rot += dy
+            self.y_rot += dx
+            self.x_rot %= 360
+            self.y_rot %= 360
+
+            self.last_pos = event.pos()
+            self.update()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.last_pos = None
 
 class CubePage(QWidget):
     def __init__(self):
